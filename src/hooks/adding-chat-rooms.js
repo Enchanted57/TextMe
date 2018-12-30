@@ -17,10 +17,9 @@ module.exports = async function(context) {
         }
     });
 
-    // find intersection
     userChatRooms = userChatRooms.data.map(x => x.dataValues.chatRoomId);
     friendChatRooms = friendChatRooms.data.map(x => x.dataValues.chatRoomId);
-
+    // find intersections
     let intersectionValuesList = userChatRooms.filter(x => friendChatRooms.indexOf(x) != -1);
 
     let chatRoom;

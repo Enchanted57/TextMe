@@ -57,7 +57,30 @@ class Service {
       }
       delete user.dataValues.password;
       user.dataValues.contacts = friends;
-  
+      // obtains all groups user contains in
+      let userChatRooms = await this.options.userChatRooms.find({
+        query: {
+          userId: user.id
+        }
+      });
+
+      userChatRoomsIds = userChatRooms.data.map(r => r.dataValues.chatRoomId);
+      
+      let userGroups = await this.options.chatRooms.find({
+        query: {
+          id: {
+            $in: userChatRoomsIds
+          },
+          isGroup: true
+        }
+      });
+      let groupArr = [];
+      for (let group of userGroups.data) {
+        groupArr.push(group.dataValues);
+      }
+      user.dataValues.groups = groupArr;
+
+
       return user;
     } catch(e) {
       return new errors.BadRequest(e.toString());
