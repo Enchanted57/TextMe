@@ -23,17 +23,17 @@ module.exports = async function(context) {
     let intersectionValuesList = userChatRooms.filter(x => friendChatRooms.indexOf(x) != -1);
 
     let chatRoom;
-    // chat-room already exists
-    if (intersectionValuesList.length) {
-        chatRoom = await context.app.service('chat-rooms').find({
-            query: {
-               id: {
-                   $in: intersectionValuesList
-               },
-               isGroup: false
-            }
-        });
-    } else {
+    // chat-room already exists and it is not group
+    chatRoom = await context.app.service('chat-rooms').find({
+        query: {
+           id: {
+               $in: intersectionValuesList
+           },
+           isGroup: false
+        }
+    });
+
+    if (!chatRoom.data.length) {
         chatRoom = await context.app.service('chat-rooms').create({
             name: `${user.name} and ${friend.name} conversation`,
             isGroup: false
