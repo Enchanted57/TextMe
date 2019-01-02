@@ -1,14 +1,14 @@
 const errors = require('@feathersjs/errors');
 
 module.exports = async function(context) {
-    
-    if (context.data.userId == context.data.friendId) {
-    
+    const friendId = context.data.friendId || context.params.query.friendId,
+          userId   = context.data.userId || context.params.query.userId
+
+    if (userId == friendId) {
         return Promise.reject( 
             new errors.BadRequest('friendId and userId cannot contain the same value.')
         );
     }
-    const friendId = context.data.friendId;
 
     try {
         const user = await context.app.service('user').get(friendId);

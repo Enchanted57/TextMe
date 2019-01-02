@@ -1,7 +1,10 @@
 const { authenticate } = require('@feathersjs/authentication').hooks;
 
 const addingChatRooms = require('../../hooks/adding-chat-rooms');
-const validateFriendId = require('../../hooks/validate-friend-id');
+const validateFriendId = require('../../hooks/validate-friend-id'),
+      validateFriendExistence = require('../../hooks/validate-friend-existence')
+      addContactToContact = require('../../hooks/add-contact-to-contact');
+
 
 module.exports = {
   before: {
@@ -11,14 +14,14 @@ module.exports = {
     create: [validateFriendId],
     update: [validateFriendId],
     patch: [],
-    remove: []
+    remove: [validateFriendId, validateFriendExistence]
   },
 
   after: {
     all: [],
     find: [],
     get: [],
-    create: [addingChatRooms],
+    create: [addingChatRooms, addContactToContact],
     update: [],
     patch: [],
     remove: []

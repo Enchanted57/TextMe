@@ -39,14 +39,18 @@ module.exports = async function(context) {
             isGroup: false
         });
 
-        context.app.service('user-chat-room').create({
+        let query1 = context.app.service('user-chat-room').create({
             userId: context.data.userId,
             chatRoomId: chatRoom.dataValues.id
         });
-        context.app.service('user-chat-room').create({
+        let query2 = context.app.service('user-chat-room').create({
             userId: context.data.friendId,
             chatRoomId: chatRoom.dataValues.id
         });
+
+        await Promise.all([query1, query2])
+            .then(values => {} )
+            .catch(error => error.message);
     }
     
     return context;
