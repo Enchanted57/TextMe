@@ -37,6 +37,6 @@ async function validateChatRoomId(context) {
       userId
     }
   });
-  console.log(result)
+  
   return result.data.length == 0 ? false : true;
 }
