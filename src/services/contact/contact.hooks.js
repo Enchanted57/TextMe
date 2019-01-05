@@ -5,6 +5,7 @@ const validateFriendId = require('../../hooks/validate-friend-id'),
       validateFriendExistence = require('../../hooks/validate-friend-existence')
       addContactToContact = require('../../hooks/add-contact-to-contact');
 
+const notImplemented = require('./notImplemented');
 
 module.exports = {
   before: {
@@ -14,7 +15,7 @@ module.exports = {
     create: [validateFriendId],
     update: [validateFriendId],
     patch: [],
-    remove: [validateFriendId, validateFriendExistence]
+    remove: [notImplemented(), validateFriendId, validateFriendExistence]
   },
 
   after: {
