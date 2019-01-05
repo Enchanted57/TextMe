@@ -4,12 +4,14 @@ const {
   hashPassword, protect
 } = require('@feathersjs/authentication-local').hooks;
 
+const validateUserObject = require('../../hooks/validate-user-object');
+
 module.exports = {
   before: {
     all: [],
     find: [ authenticate('jwt') ],
     get: [ authenticate('jwt') ],
-    create: [ hashPassword() ],
+    create: [hashPassword(), validateUserObject()],
     update: [ hashPassword(),  authenticate('jwt') ],
     patch: [ hashPassword(),  authenticate('jwt') ],
     remove: [ authenticate('jwt') ]
