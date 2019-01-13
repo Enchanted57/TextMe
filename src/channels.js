@@ -4,6 +4,8 @@ module.exports = function(app) {
     return;
   }
 
+  const messagesService = app.service('messages');
+
   app.on('connection', connection => {
     // On a new real-time connection, add it to the anonymous channel
     app.channel('anonymous').join(connection);
@@ -13,6 +15,20 @@ module.exports = function(app) {
     // connection can be undefined if there is no
     // real-time connection, e.g. when logging in via REST
     if(connection) {
+      const { user } = connection;
+
+      app.service('user-chat-room').find({
+        paginate: false,
+        query: {
+          userId: user.dataValues.id,
+        }
+      }).then(res => {
+        res.forEach(ucr => {
+          app.channel(`room/${ucr.dataValues.chatRoomId}`).join(connection);
+        });
+      }).catch(err => {
+        console.log(err);
+      })
       // Obtain the logged in user from the connection
       // const user = connection.user;
       
@@ -41,7 +57,7 @@ module.exports = function(app) {
     // Here you can add event publishers to channels set up in `channels.js`
     // To publish only for a specific event use `app.publish(eventname, () => {})`
 
-    console.log('Publishing all events to all authenticated users. See `channels.js` and https://docs.feathersjs.com/api/channels.html for more information.'); // eslint-disable-line
+    //console.log('Publishing all events to all authenticated users. See `channels.js` and https://docs.feathersjs.com/api/channels.html for more information.'); // eslint-disable-line
 
     // e.g. to publish all service events to all authenticated users use
     return app.channel('authenticated');
@@ -58,4 +74,9 @@ module.exports = function(app) {
   //     app.channel(`emails/${data.recipientEmail}`)
   //   ];
   // });
+
+  messagesService.publish('created', (data, hook) => {
+    return app.channel(`room/${data.dataValues.chatRoomId}`);
+  })
+
 };
