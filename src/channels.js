@@ -5,6 +5,7 @@ module.exports = function(app) {
   }
 
   const messagesService = app.service('messages');
+  const contactsService = app.service('contacts');
 
   app.on('connection', connection => {
     // On a new real-time connection, add it to the anonymous channel
@@ -16,6 +17,8 @@ module.exports = function(app) {
     // real-time connection, e.g. when logging in via REST
     if(connection) {
       const { user } = connection;
+
+      app.channel(`userIds/${user.dataValues.id}`).join(connection);
 
       app.service('user-chat-room').find({
         paginate: false,
@@ -77,6 +80,13 @@ module.exports = function(app) {
 
   messagesService.publish('created', (data, hook) => {
     return app.channel(`room/${data.dataValues.chatRoomId}`);
-  })
+  });
+
+  contactsService.publish('created', (data, hook) => {
+    return [
+      app.channel(`userIds/${data.dataValues.userId}`),
+      app.channel(`userIds/${data.dataValues.friendId}`)
+    ];
+  });
 
 };
