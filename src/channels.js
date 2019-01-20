@@ -7,7 +7,14 @@ module.exports = function(app) {
   const messagesService = app.service('messages');
   const contactsService = app.service('contacts');
 
+  messagesService.on('created', message => {
+    messagesService.publish('created', (data, hook) => {
+      return app.channel(`room/${data.dataValues.chatRoomId}`);
+    });
+  });
+
   app.on('connection', connection => {
+    console.log('new connection');
     // On a new real-time connection, add it to the anonymous channel
     app.channel('anonymous').join(connection);
   });
@@ -17,7 +24,7 @@ module.exports = function(app) {
     // real-time connection, e.g. when logging in via REST
     if(connection) {
       const { user } = connection;
-
+      console.log(`New connection detected: ${user.dataValues.name}`);
       app.channel(`userIds/${user.dataValues.id}`).join(connection);
 
       app.service('user-chat-room').find({
@@ -46,9 +53,9 @@ module.exports = function(app) {
     return app.channel('authenticated');
   });
 
-  messagesService.publish('created', (data, hook) => {
-    return app.channel(`room/${data.dataValues.chatRoomId}`);
-  });
+  // messagesService.publish('created', (data, hook) => {
+  //   return app.channel(`room/${data.dataValues.chatRoomId}`);
+  // });
 
   contactsService.publish('created', (data, hook) => {
     return [
